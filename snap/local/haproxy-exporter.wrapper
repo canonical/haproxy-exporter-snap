@@ -1,0 +1,19 @@
+#!/bin/bash
+
+URI="http://localhost:8404"
+LISTEN_ADDRESS="localhost:9101"
+
+scrape_uri="$(snapctl get scrape-uri)"
+if [ -n "$scrape_uri" ]; then
+  echo "scrape_uri is set to $scrape_uri"
+  URI="$scrape_uri"
+fi
+
+listen_address="$(snapctl get web.listen-address)"
+if [ -n "$listen_address" ]; then
+  echo "web.listen-address is set to $listen_address"
+  LISTEN_ADDRESS="$listen_address"
+fi
+
+echo "running $SNAP/bin/haproxy_exporter --web.listen-address ${LISTEN_ADDRESS} --haproxy.scrape-uri ${URI}?stats;csv"
+"$SNAP/bin/haproxy_exporter" --web.listen-address "$LISTEN_ADDRESS" --haproxy.scrape-uri "${URI}?stats;csv"

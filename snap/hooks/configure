@@ -1,0 +1,6 @@
+#!/bin/bash
+
+[ -z "$(snapctl get web.listen-address)" ] && snapctl set web.listen-address=localhost:9101
+[ -z "$(snapctl get scrape-uri)" ] && snapctl set scrape-uri=http://localhost:8404
+
+snapctl restart $SNAP_NAME

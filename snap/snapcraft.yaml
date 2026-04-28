@@ -1,0 +1,93 @@
+name: haproxy-exporter
+title: HAProxy Exporter
+summary: A Snap package for Prometheus HAProxy Exporter
+base: core24
+
+adopt-info: haproxy-exporter
+
+issues: https://github.com/canonical/haproxy-exporter-snap/issues
+source-code: https://github.com/canonical/haproxy-exporter-snap
+website: https://snapcraft.io/haproxy-exporter
+
+license: Apache-2.0
+confinement: strict
+
+description: |
+  This snap includes haproxy_exporter to provide HAProxy statistics via Prometheus.
+  Grafana dashboards can then be used to visualize the exported metrics.
+
+  **How-To**
+  ---
+
+  **How to install the snap:**
+
+     sudo snap install haproxy-exporter
+
+  The snap will start scraping HAProxy stats from `http://localhost:8404` and expose
+  them on `localhost:9101/metrics` for Prometheus consumption by default.
+  The `?stats;csv` suffix is appended to the scrape URI automatically.
+
+  **How to configure the service:**
+
+  The haproxy-exporter can be configured by setting the snap configuration options.\
+  For example:
+
+     # Get all the configuration options
+     sudo snap get haproxy-exporter
+
+     # Set a different HAProxy scrape URI (basic auth credentials are supported)
+     sudo snap set haproxy-exporter scrape-uri=http://user:pass@localhost:8404
+
+     # Set a different exporter listen address and port
+     sudo snap set haproxy-exporter web.listen-address=localhost:9664
+
+     # Restart the exporter service to apply the changes
+     sudo snap restart haproxy-exporter.exporter
+
+  **Reference**
+  ---
+
+  Available configuration options:
+
+  - `scrape-uri`: the URI on which to scrape HAProxy stats.
+    Basic auth credentials can be embedded in the URI (e.g. `http://user:pass@host:port`).
+    The default is `http://localhost:8404`.
+  - `web.listen-address`: the address and port on which the exporter exposes metrics.
+    The default is `localhost:9101`.
+
+  **Links**
+  ---
+  Upstream haproxy_exporter repository\
+  https://github.com/prometheus/haproxy_exporter
+
+platforms:
+  amd64:
+  arm64:
+  s390x:
+  ppc64el:
+
+apps:
+  haproxy-exporter:
+    daemon: simple
+    command: bin/haproxy-exporter.wrapper
+    plugs:
+      - network
+      - network-bind
+
+parts:
+  haproxy-exporter:
+    plugin: go
+    build-snaps: [go/latest/stable]
+    source: https://github.com/prometheus/haproxy_exporter
+    source-type: git
+    source-tag: v0.15.0
+    override-pull: |
+      craftctl default
+      TAG=$(git describe --tags)
+      SNAP_GIT_VERSION=$(git -C $CRAFT_PROJECT_DIR describe --always --dirty --abbrev=10)
+      craftctl set version="${TAG#v}+snap-${SNAP_GIT_VERSION}"
+  scripts:
+    plugin: dump
+    source: snap/local
+    organize:
+      haproxy-exporter.wrapper: bin/haproxy-exporter.wrapper
