@@ -1,9 +1,11 @@
 name: haproxy-exporter
 title: HAProxy Exporter
-summary: A Snap package for Prometheus HAProxy Exporter
+summary: Snap for Prometheus HAProxy Exporter
 base: core24
 
 adopt-info: haproxy-exporter
+
+icon: snap/gui/icon.png
 
 issues: https://github.com/canonical/haproxy-exporter-snap/issues
 source-code: https://github.com/canonical/haproxy-exporter-snap
